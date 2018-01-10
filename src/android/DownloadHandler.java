@@ -97,7 +97,7 @@ public class DownloadHandler extends Handler {
         LOG.d(TAG, "APK Filename: " + apkFile.toString());
 
         // 通过Intent安装APK文件
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.N){
+        if(Build.VERSION.SDK_INT >= 24 /* Build.VERSION_CODES.N */){
             LOG.d(TAG, "Build SDK Greater than or equal to Nougat");
             Uri apkUri = FileProvider.getUriForFile(mContext, "com.vaenow.appupdate.android.provider", apkFile);
             Intent i = new Intent(Intent.ACTION_INSTALL_PACKAGE);
