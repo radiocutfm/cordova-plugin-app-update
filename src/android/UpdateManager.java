@@ -17,6 +17,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import java.lang.ref.WeakReference;
+
 /**
  * Created by LuoWen on 2015/10/27.
  * <p/>
@@ -45,6 +47,9 @@ public class UpdateManager {
     private List<Version> queue = new ArrayList<Version>(1);
     private CheckUpdateThread checkUpdateThread;
     private DownloadApkThread downloadApkThread;
+
+    public WeakReference<CheckAppUpdate> the_plugin;
+
 
     public UpdateManager(Context context, CordovaInterface cordova) {
         this.cordova = cordova;
@@ -168,6 +173,9 @@ public class UpdateManager {
     };
 
     private void emitNoticeDialogOnClick() {
+        if (the_plugin) {
+            the_plugin.get().verifyStoragePermissions(true);
+        }
         isDownloading = true;
         // 显示下载对话框
         Map<String, Object> ret = msgBox.showDownloadDialog(

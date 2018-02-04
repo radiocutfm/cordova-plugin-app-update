@@ -8,6 +8,8 @@ import org.apache.cordova.CordovaPlugin;
 import org.json.JSONArray;
 import org.json.JSONException;
 
+import java.lang.ref.WeakReference;
+
 /**
  * Created by LuoWen on 2015/10/27.
  */
@@ -27,7 +29,9 @@ public class CheckAppUpdate extends CordovaPlugin {
             throws JSONException {
 
         if (action.equals("checkAppUpdate")) {
-            verifyStoragePermissions();
+            if (!verifyStoragePermissions(false)) {
+                getUpdateManager(args, callbackContext).the_plugin = new WeakReference<CheckAppUpdate>(this);
+            }
             getUpdateManager(args, callbackContext).checkUpdate();
             return true;
         }
@@ -45,11 +49,16 @@ public class CheckAppUpdate extends CordovaPlugin {
         return this.updateManager.options(args, callbackContext);
     }
 
-    public void verifyStoragePermissions() {
+    public boolean verifyStoragePermissions(boolean askPermissions) {
         // Check if we have write permission
         // and if we don't prompt the user
         if (!cordova.hasPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-            cordova.requestPermissions(this, REQUEST_EXTERNAL_STORAGE, PERMISSIONS_STORAGE);
+            if (askPermissions) {
+                cordova.requestPermissions(this, REQUEST_EXTERNAL_STORAGE, PERMISSIONS_STORAGE);
+            };
+            return cordova.hasPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        } else {
+            return true;
         }
     }
 }
