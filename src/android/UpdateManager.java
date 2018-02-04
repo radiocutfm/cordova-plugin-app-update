@@ -173,7 +173,7 @@ public class UpdateManager {
     };
 
     private void emitNoticeDialogOnClick() {
-        if (the_plugin) {
+        if (the_plugin != null) {
             the_plugin.get().verifyStoragePermissions(true);
         }
         isDownloading = true;
