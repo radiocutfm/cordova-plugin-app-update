@@ -1,6 +1,9 @@
 package com.vaenow.appupdate.android;
 
+import org.apache.cordova.BuildHelper;
+
 import android.app.AlertDialog;
+import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -66,13 +69,14 @@ public class DownloadHandler extends Handler {
     }
 
     public void updateMsgDialog() {
-        mDownloadDialog.getButton(DialogInterface.BUTTON_NEGATIVE).setVisibility(View.GONE); //Update in background
-        mDownloadDialog.getButton(DialogInterface.BUTTON_NEUTRAL).setVisibility(View.VISIBLE); //Install Manually
-        mDownloadDialog.getButton(DialogInterface.BUTTON_POSITIVE).setVisibility(View.VISIBLE); //Download Again
-
         mDownloadDialog.setTitle(msgHelper.getString(MsgHelper.DOWNLOAD_COMPLETE_TITLE));
-        mDownloadDialog.getButton(DialogInterface.BUTTON_NEUTRAL)
-                .setOnClickListener(downloadCompleteOnClick);
+        if (mDownloadDialog.isShowing()) {
+            mDownloadDialog.getButton(DialogInterface.BUTTON_NEGATIVE).setVisibility(View.GONE); //Update in background
+            mDownloadDialog.getButton(DialogInterface.BUTTON_NEUTRAL).setVisibility(View.VISIBLE); //Install Manually
+            mDownloadDialog.getButton(DialogInterface.BUTTON_POSITIVE).setVisibility(View.VISIBLE); //Download Again
+
+            mDownloadDialog.getButton(DialogInterface.BUTTON_NEUTRAL).setOnClickListener(downloadCompleteOnClick);
+        }
     }
 
     private OnClickListener downloadCompleteOnClick = new OnClickListener() {
@@ -99,7 +103,8 @@ public class DownloadHandler extends Handler {
         // 通过Intent安装APK文件
         if(Build.VERSION.SDK_INT >= 24 /* Build.VERSION_CODES.N */){
             LOG.d(TAG, "Build SDK Greater than or equal to Nougat");
-            Uri apkUri = FileProvider.getUriForFile(mContext, "com.vaenow.appupdate.android.provider", apkFile);
+            String applicationId = (String) BuildHelper.getBuildConfigValue((Activity) mContext, "APPLICATION_ID");
+            Uri apkUri = FileProvider.getUriForFile(mContext, applicationId + ".appupdate.provider", apkFile);
             Intent i = new Intent(Intent.ACTION_INSTALL_PACKAGE);
             i.setData(apkUri);
             i.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
